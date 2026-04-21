@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GREAT Quiz - Admin Analytics</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Kanit:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
@@ -41,10 +44,14 @@
         body::before {
             content: '';
             position: fixed;
-            top: -50%; left: -50%; width: 200%; height: 200%;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
             background: radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.05) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(138, 43, 226, 0.05) 0%, transparent 40%);
-            z-index: -1; pointer-events: none;
+                radial-gradient(circle at 80% 20%, rgba(138, 43, 226, 0.05) 0%, transparent 40%);
+            z-index: -1;
+            pointer-events: none;
         }
 
         .header {
@@ -79,7 +86,10 @@
             transition: 0.3s;
             text-decoration: none;
         }
-        .btn-back:hover { background: rgba(255, 255, 255, 0.2); }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
 
         .container {
             padding: 30px;
@@ -103,13 +113,20 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
             background: linear-gradient(90deg, var(--mc-cyan), var(--mc-purple));
         }
 
-        .card-full { grid-column: span 2; }
+        .card-full {
+            grid-column: span 2;
+        }
 
         .card h2 {
             margin: 0 0 20px 0;
@@ -121,7 +138,12 @@
             font-weight: 600;
         }
 
-        .card h2 span { color: white; display:flex; align-items:center; gap:10px; }
+        .card h2 span {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
         .chart-container {
             position: relative;
@@ -152,20 +174,33 @@
             margin: 5px 0;
         }
 
-        .kpi-label { font-size: 13px; color: var(--text-muted); }
+        .kpi-label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
 
         table.data-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 14px;
         }
-        .data-table th, .data-table td {
+
+        .data-table th,
+        .data-table td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .data-table th { color: var(--mc-cyan); font-weight: 600; background: rgba(0, 0, 0, 0.2); }
-        .data-table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+        .data-table th {
+            color: var(--mc-cyan);
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .data-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
 
         .filter-row {
             display: flex;
@@ -173,7 +208,8 @@
             margin-bottom: 20px;
         }
 
-        select, input {
+        select,
+        input {
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
@@ -183,33 +219,79 @@
             outline: none;
             transition: 0.3s;
         }
-        select:focus, input:focus { border-color: var(--mc-cyan); }
+
+        select:focus,
+        input:focus {
+            border-color: var(--mc-cyan);
+        }
 
         .loading-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 9999; color: var(--mc-cyan);
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: var(--mc-cyan);
         }
+
         .loader-spinner {
-            width: 50px; height: 50px; border: 4px solid rgba(0, 240, 255, 0.1);
-            border-top: 4px solid var(--mc-cyan); border-radius: 50%;
-            animation: spin 1s linear infinite; margin-bottom: 15px;
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(0, 240, 255, 0.1);
+            border-top: 4px solid var(--mc-cyan);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 
         /* SCROLLBAR */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-slate); }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-slate);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
 
         @media (max-width: 900px) {
-            .container { grid-template-columns: 1fr; }
-            .card-full { grid-column: 1; }
-            .kpi-grid { grid-template-columns: 1fr 1fr; }
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .card-full {
+                grid-column: 1;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr 1fr;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <div id="loading" class="loading-overlay">
@@ -218,21 +300,34 @@
     </div>
 
     <div class="header">
-        <h1>GREAT QUIZ <span style="font-weight:300; color:var(--text-muted); font-size:20px;">| ADMIN ANALYTICS</span></h1>
+        <h1>GREAT QUIZ <span style="font-weight:300; color:var(--text-muted); font-size:20px;">| ADMIN ANALYTICS</span>
+        </h1>
         <a href="AI Theme.html" class="btn-back"><i class="fas fa-arrow-left"></i> กลับไปหน้าเกม</a>
     </div>
 
     <div class="container">
-        
+
         <!-- KPI Row -->
         <div class="card card-full" style="padding-bottom: 10px;">
             <div class="kpi-grid" id="kpiContainer">
-                <div class="kpi-box"><div class="kpi-label">ผู้เล่นทั้งหมด</div><div class="kpi-value" id="kpiTotalUsers">-</div></div>
-                <div class="kpi-box"><div class="kpi-label">จำนวนตอบคำถาม (ครั้ง)</div><div class="kpi-value" id="kpiTotalAnswers">-</div></div>
-                <div class="kpi-box"><div class="kpi-label">คำตอบถูกต้อง (%)</div><div class="kpi-value" id="kpiAccuracy" style="color:var(--agri-green);">-</div></div>
-                <div class="kpi-box"><div class="kpi-label">ความเร็วเฉลี่ย (วิ/ข้อ)</div><div class="kpi-value" id="kpiAvgSpeed" style="color:var(--mc-cyan);">-</div></div>
+                <div class="kpi-box">
+                    <div class="kpi-label">ผู้เล่นทั้งหมด</div>
+                    <div class="kpi-value" id="kpiTotalUsers">-</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-label">จำนวนตอบคำถาม (ครั้ง)</div>
+                    <div class="kpi-value" id="kpiTotalAnswers">-</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-label">คำตอบถูกต้อง (%)</div>
+                    <div class="kpi-value" id="kpiAccuracy" style="color:var(--agri-green);">-</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-label">ความเร็วเฉลี่ย (วิ/ข้อ)</div>
+                    <div class="kpi-value" id="kpiAvgSpeed" style="color:var(--mc-cyan);">-</div>
+                </div>
             </div>
-            
+
             <div class="filter-row">
                 <select id="siteFilter" onchange="filterData()">
                     <option value="ALL">ทุกสาขา (All Sites)</option>
@@ -246,13 +341,16 @@
                     <option value="WEEK" selected>7 วันที่ผ่านมา</option>
                 </select>
                 <div style="flex-grow:1;"></div>
-                <button class="btn-back" onclick="initDashboard()" style="background:var(--mc-purple); border-color:var(--mc-purple);"><i class="fas fa-sync-alt"></i> Reload Data</button>
+                <button class="btn-back" onclick="initDashboard()"
+                    style="background:var(--mc-purple); border-color:var(--mc-purple);"><i class="fas fa-sync-alt"></i>
+                    Reload Data</button>
             </div>
         </div>
 
         <!-- Participation Rate -->
         <div class="card">
-            <h2><span><i class="fas fa-users" style="color:var(--mc-cyan)"></i> สถิติการเข้าร่วม (Participation)</span></h2>
+            <h2><span><i class="fas fa-users" style="color:var(--mc-cyan)"></i> สถิติการเข้าร่วม (Participation)</span>
+            </h2>
             <div class="chart-container"><canvas id="participationChart"></canvas></div>
         </div>
 
@@ -264,13 +362,15 @@
 
         <!-- Activity Timeline -->
         <div class="card card-full">
-            <h2><span><i class="fas fa-chart-line" style="color:var(--gold)"></i> ปริมาณการตอบในแต่ละวัน (Activity Timeline)</span></h2>
+            <h2><span><i class="fas fa-chart-line" style="color:var(--gold)"></i> ปริมาณการตอบในแต่ละวัน (Activity
+                    Timeline)</span></h2>
             <div class="chart-container" style="height: 350px;"><canvas id="timelineChart"></canvas></div>
         </div>
 
         <!-- Question Difficulty -->
         <div class="card card-full">
-            <h2><span><i class="fas fa-brain" style="color:var(--mc-pink)"></i> สถิติความยากง่ายรายข้อ (Question Performance)</span></h2>
+            <h2><span><i class="fas fa-brain" style="color:var(--mc-pink)"></i> สถิติความยากง่ายรายข้อ (Question
+                    Performance)</span></h2>
             <div style="overflow-x:auto;">
                 <table class="data-table">
                     <thead>
@@ -330,6 +430,7 @@
                     const { data, error } = await sb.from('logs')
                         .select('employee_id, point, created_at, question_id')
                         .order('created_at', { ascending: false })
+                        .order('id', { ascending: false })
                         .range(offset, offset + fetchLimit - 1);
                     if (error) throw error;
                     if (!data || data.length === 0) break;
@@ -355,13 +456,13 @@
 
             // Date filtering limits logs
             let filteredLogs = rawLogs;
-            
+
             if (dateParam !== 'ALL') {
                 const now = new Date();
                 let thresholdDate = new Date();
-                if (dateParam === 'TODAY') thresholdDate.setHours(0,0,0,0);
+                if (dateParam === 'TODAY') thresholdDate.setHours(0, 0, 0, 0);
                 else if (dateParam === 'WEEK') thresholdDate.setDate(now.getDate() - 7);
-                
+
                 filteredLogs = filteredLogs.filter(l => new Date(l.created_at) >= thresholdDate);
             }
 
@@ -370,20 +471,21 @@
             const empPlayCount = {};
             rawUsers.forEach(u => {
                 let s = u.site ? u.site.trim().toUpperCase() : 'UNKNOWN';
-                if(s === 'PD') s = 'PPD';
-                if(s === 'NK') s = 'NKL';
-                empSiteMap[u.employee_id] = s;
-                empPlayCount[u.employee_id] = 0;
+                if (s === 'PD') s = 'PPD';
+                if (s === 'NK') s = 'NKL';
+                empSiteMap[String(u.employee_id).trim()] = s;
+                empPlayCount[String(u.employee_id).trim()] = 0;
             });
 
             // Count plays
             filteredLogs.forEach(l => {
-                if (empPlayCount[l.employee_id] !== undefined) empPlayCount[l.employee_id]++;
+                const eid = String(l.employee_id).trim();
+                if (empPlayCount[eid] !== undefined) empPlayCount[eid]++;
             });
 
             // Site Filtering
             if (siteParam !== 'ALL') {
-                filteredLogs = filteredLogs.filter(l => empSiteMap[l.employee_id] === siteParam);
+                filteredLogs = filteredLogs.filter(l => empSiteMap[String(l.employee_id).trim()] === siteParam);
             }
 
             updateKPIs(filteredLogs, empSiteMap, siteParam);
@@ -401,22 +503,53 @@
             let validSpeedCount = 0;
 
             logs.forEach(l => {
-                activeEmps.add(l.employee_id);
+                activeEmps.add(String(l.employee_id).trim());
                 if ((l.point || 0) > 0) totalCorrect++; // point > 0 means answered correct
             });
 
             let baseUsersCount = rawUsers.length;
             if (currentSiteFilter !== 'ALL') {
-                baseUsersCount = rawUsers.filter(u => (u.site && u.site.trim().toUpperCase() === currentSiteFilter)).length;
+                baseUsersCount = rawUsers.filter(u => {
+                    let s = u.site ? u.site.trim().toUpperCase() : 'UNKNOWN';
+                    if (s === 'PD') s = 'PPD';
+                    if (s === 'NK') s = 'NKL';
+                    return s === currentSiteFilter;
+                }).length;
             }
 
             document.getElementById('kpiTotalUsers').innerText = `${activeEmps.size} / ${baseUsersCount}`;
             document.getElementById('kpiTotalAnswers').innerText = logs.length.toLocaleString();
-            
+
             const acc = logs.length > 0 ? ((totalCorrect / logs.length) * 100).toFixed(1) : 0;
             document.getElementById('kpiAccuracy').innerText = `${acc}%`;
 
-            document.getElementById('kpiAvgSpeed').innerText = `N/A`;
+            // Calculate Avg Speed using Time-Difference Estimation
+            let timeDiffs = [];
+            const empLogs = {};
+            logs.forEach(l => {
+                const eid = String(l.employee_id).trim();
+                if (!empLogs[eid]) empLogs[eid] = [];
+                empLogs[eid].push(l);
+            });
+
+            for (const empId in empLogs) {
+                const elogs = empLogs[empId];
+                // sort desc
+                elogs.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                for (let i = 0; i < elogs.length - 1; i++) {
+                    const diff = new Date(elogs[i].created_at).getTime() - new Date(elogs[i + 1].created_at).getTime();
+                    if (diff > 500 && diff < 15000) {
+                        timeDiffs.push(diff);
+                    }
+                }
+            }
+
+            let avgTimeStr = "N/A";
+            if (timeDiffs.length > 0) {
+                const avgSpeedSeconds = (timeDiffs.reduce((a, b) => a + b, 0) / timeDiffs.length) / 1000;
+                avgTimeStr = avgSpeedSeconds.toFixed(2) + "วิ";
+            }
+            document.getElementById('kpiAvgSpeed').innerText = avgTimeStr;
         }
 
         function destroyChart(id) { if (charts[id]) charts[id].destroy(); }
@@ -424,7 +557,7 @@
         function renderParticipationChart(empPlayCount, empSiteMap, siteParam) {
             destroyChart('participationChart');
             const dataSite = { PPD: { played: 0, nonPlayed: 0 }, HO: { played: 0, nonPlayed: 0 }, NKL: { played: 0, nonPlayed: 0 } };
-            
+
             rawUsers.forEach(u => {
                 const s = empSiteMap[u.employee_id];
                 if (dataSite[s] && (siteParam === 'ALL' || siteParam === s)) {
@@ -490,7 +623,7 @@
 
         function renderTimelineChart(logs) {
             destroyChart('timelineChart');
-            
+
             // Group by Day (or hour if it's TODAY)
             const dateFilter = document.getElementById('dateFilter').value;
             const isToday = dateFilter === 'TODAY';
@@ -499,16 +632,16 @@
             const now = new Date();
             if (isToday) {
                 // Initialize today's hours from 00:00 to 23:00
-                for(let i=0; i<24; i++) {
-                    timeBuckets[`${i.toString().padStart(2,'0')}:00`] = 0;
+                for (let i = 0; i < 24; i++) {
+                    timeBuckets[`${i.toString().padStart(2, '0')}:00`] = 0;
                 }
             } else if (dateFilter === 'WEEK' || dateFilter === 'ALL') {
                 // Initialize past 7 days (or 14 days)
-                let daysToPad = dateFilter === 'WEEK' ? 6 : 14; 
-                for(let i=daysToPad; i>=0; i--) {
+                let daysToPad = dateFilter === 'WEEK' ? 6 : 14;
+                for (let i = daysToPad; i >= 0; i--) {
                     let d = new Date(now);
                     d.setDate(d.getDate() - i);
-                    timeBuckets[`${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}`] = 0;
+                    timeBuckets[`${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`] = 0;
                 }
             }
 
@@ -516,9 +649,9 @@
                 const dt = new Date(l.created_at);
                 let key;
                 if (isToday) {
-                    key = `${dt.getHours().toString().padStart(2,'0')}:00`;
+                    key = `${dt.getHours().toString().padStart(2, '0')}:00`;
                 } else {
-                    key = `${dt.getDate().toString().padStart(2,'0')}/${(dt.getMonth()+1).toString().padStart(2,'0')}`;
+                    key = `${dt.getDate().toString().padStart(2, '0')}/${(dt.getMonth() + 1).toString().padStart(2, '0')}`;
                 }
                 if (timeBuckets[key] !== undefined) {
                     timeBuckets[key] += 1;
@@ -532,7 +665,7 @@
             const values = keys.map(k => timeBuckets[k]);
 
             const ctx = document.getElementById('timelineChart').getContext('2d');
-            
+
             const gradient = ctx.createLinearGradient(0, 0, 0, 400);
             gradient.addColorStop(0, 'rgba(255, 204, 0, 0.5)');
             gradient.addColorStop(1, 'rgba(255, 204, 0, 0.0)');
@@ -542,7 +675,7 @@
                 data: {
                     labels: keys,
                     datasets: [{
-                        label: 'จำนวนการข้อที่มีการตอบ (Responses)',
+                        label: 'จำนวนข้อที่มีการตอบ (Responses)',
                         data: values,
                         borderColor: '#ffcc00',
                         backgroundColor: gradient,
@@ -579,7 +712,7 @@
 
             const qArr = Object.values(qStats).filter(q => q.total > 0);
             // Sort by Difficulty (lowest accuracy first)
-            qArr.sort((a,b) => (a.correct / a.total) - (b.correct / b.total));
+            qArr.sort((a, b) => (a.correct / a.total) - (b.correct / b.total));
 
             const tbody = document.getElementById('questionTableBody');
             let h = '';
@@ -605,4 +738,5 @@
 
     </script>
 </body>
+
 </html>
