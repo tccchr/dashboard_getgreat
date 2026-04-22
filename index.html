@@ -153,7 +153,7 @@
 
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 15px;
             margin-bottom: 25px;
         }
@@ -276,6 +276,90 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
+        /* Drill-down Modal Styles */
+        .player-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .player-modal.active { display: flex; opacity: 1; }
+
+        .pm-card {
+            background: linear-gradient(145deg, var(--bg-slate), var(--bg-dark));
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+            transform: translateY(30px);
+            transition: transform 0.3s;
+        }
+        .player-modal.active .pm-card { transform: translateY(0); }
+
+        .pm-header {
+            padding: 20px 25px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .pm-header h3 { margin: 0; color: white; display: flex; align-items: center; gap: 10px; font-size: 20px; }
+        .pm-close { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; transition: 0.3s; }
+        .pm-close:hover { color: var(--mc-red); }
+
+        .pm-body { padding: 25px; overflow-y: auto; flex-grow: 1; }
+
+        .pm-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .pm-chart-container { height: 250px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .pm-stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .pm-table-container {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            width: 300px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: white;
+            font-family: 'Kanit';
+            outline: none;
+        }
+        .search-input:focus { border-color: var(--mc-purple); }
+
+        .clickable-row { cursor: pointer; transition: background 0.2s; }
+        .clickable-row:hover { background: rgba(138, 43, 226, 0.15) !important; }
+
         @media (max-width: 900px) {
             .container {
                 grid-template-columns: 1fr;
@@ -327,6 +411,10 @@
                     <div class="kpi-label">ความเร็วเฉลี่ย (วิ/ข้อ)</div>
                     <div class="kpi-value" id="kpiAvgSpeed" style="color:var(--mc-cyan);">-</div>
                 </div>
+                <div class="kpi-box">
+                    <div class="kpi-label">คะแนนรวมทั้งหมด</div>
+                    <div class="kpi-value" id="kpiTotalPoints" style="color:var(--mc-pink);">-</div>
+                </div>
             </div>
 
             <div class="filter-row">
@@ -342,6 +430,9 @@
                     <option value="WEEK" selected>7 วันที่ผ่านมา</option>
                 </select>
                 <div style="flex-grow:1;"></div>
+                <button class="btn-back" id="btnClearChartFilters" onclick="clearChartFilters()"
+                    style="background:var(--mc-red); border-color:var(--mc-red); display:none; margin-right: 10px;">
+                    <i class="fas fa-times"></i> ล้างตัวกรองกราฟ</button>
                 <button class="btn-back" onclick="initDashboard()"
                     style="background:var(--mc-purple); border-color:var(--mc-purple);"><i class="fas fa-sync-alt"></i>
                     Reload Data</button>
@@ -368,6 +459,33 @@
             <div class="chart-container" style="height: 350px;"><canvas id="timelineChart"></canvas></div>
         </div>
 
+        <!-- Active Players -->
+        <div class="card card-full">
+            <h2><span><i class="fas fa-user-astronaut" style="color:var(--mc-purple)"></i> ข้อมูลผู้เล่น (Player Leaderboard)</span></h2>
+            <div class="search-container">
+                <input type="text" class="search-input" id="playerSearchInput" placeholder="🔍 ค้นหาชื่อ หรือรหัสพนักงาน..." onkeyup="filterPlayerTableLocally()">
+            </div>
+            <div class="pm-table-container" style="max-height: 400px; overflow-y:auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>รหัสพนักงาน</th>
+                            <th>ชื่อ-นามสกุล</th>
+                            <th>สาขา / Site</th>
+                            <th style="text-align:right;">คะแนนที่ได้</th>
+                            <th style="text-align:right;">ตอบถูก %</th>
+                            <th style="text-align:right;">ตอบ (ครั้ง)</th>
+                            <th style="text-align:right;">ความเร็วเฉลี่ย (วิ)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="playerTableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Question Difficulty -->
         <div class="card card-full">
             <h2><span><i class="fas fa-brain" style="color:var(--mc-pink)"></i> สถิติความยากง่ายรายข้อ (Question
@@ -392,6 +510,58 @@
 
     </div>
 
+    <!-- Drill-down Modal -->
+    <div id="playerModal" class="player-modal">
+        <div class="pm-card">
+            <div class="pm-header">
+                <h3 id="pmName"><i class="fas fa-user-circle" style="color:var(--mc-cyan)"></i> โหลดข้อมูล...</h3>
+                <button class="pm-close" onclick="closePlayerModal()">&times;</button>
+            </div>
+            <div class="pm-body">
+                <div class="pm-grid">
+                    <div class="pm-chart-container">
+                        <canvas id="pmActivityChart"></canvas>
+                    </div>
+                    <div class="pm-stats-container">
+                        <div class="kpi-box" style="border-color:rgba(255, 204, 0, 0.3)">
+                            <div class="kpi-label">คะแนนรวม</div>
+                            <div class="kpi-value" style="color:var(--gold)" id="pmScore">-</div>
+                        </div>
+                        <div class="kpi-box" style="border-color:rgba(0, 230, 118, 0.3)">
+                            <div class="kpi-label">ตอบถูก (%)</div>
+                            <div class="kpi-value" style="color:var(--agri-green)" id="pmAcc">-</div>
+                        </div>
+                        <div class="kpi-box" style="border-color:rgba(0, 240, 255, 0.3)">
+                            <div class="kpi-label">ความเร็วเฉลี่ย (วิ/ข้อ)</div>
+                            <div class="kpi-value" style="color:var(--mc-cyan)" id="pmSpeed">-</div>
+                        </div>
+                        <div class="kpi-box" style="border-color:rgba(138, 43, 226, 0.3)">
+                            <div class="kpi-label">จำนวนตอบ (ครั้ง)</div>
+                            <div class="kpi-value" style="color:var(--text-main)" id="pmTotal">-</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h4 style="margin-top:0; color:var(--text-muted); font-size:16px;">ประวัติการทำล่าสุด (แบบลงรายละเอียด)</h4>
+                <div class="pm-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th># วัน-เวลา</th>
+                                <th>ID ข้อ</th>
+                                <th style="text-align:center;">สถานะ</th>
+                                <th style="text-align:right;">คะแนนที่ได้</th>
+                                <th style="text-align:right;">ใช้เวลา (วิ)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pmHistoryTable">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Supabase Initialization
         const SB_URL = 'https://qqofouxklddvsxedxzeg.supabase.co';
@@ -411,6 +581,22 @@
         let rawUsers = [];
         let rawQuestions = [];
         let charts = {};
+        
+        // Globals for Interactive Chart Filters
+        let chartFilters = {
+            accuracy: null, // 'correct' or 'incorrect'
+            timelineDate: null // key string
+        };
+
+        function clearChartFilters() {
+            chartFilters.accuracy = null;
+            chartFilters.timelineDate = null;
+            filterData();
+        }
+
+        // Globals for Drill-down
+        let gFilteredLogs = [];
+        let gEmpDetailsMap = {};
 
         async function initDashboard() {
             document.getElementById('loading').style.display = 'flex';
@@ -467,15 +653,46 @@
                 filteredLogs = filteredLogs.filter(l => new Date(l.created_at) >= thresholdDate);
             }
 
+            // Apply Chart Filters
+            const isToday = dateParam === 'TODAY';
+            if (chartFilters.accuracy === 'correct') {
+                filteredLogs = filteredLogs.filter(l => (l.point || 0) > 0);
+            } else if (chartFilters.accuracy === 'incorrect') {
+                filteredLogs = filteredLogs.filter(l => (l.point || 0) <= 0);
+            }
+
+            if (chartFilters.timelineDate) {
+                filteredLogs = filteredLogs.filter(l => {
+                    const dt = new Date(l.created_at);
+                    let key;
+                    if (isToday) {
+                        key = `${dt.getHours().toString().padStart(2, '0')}:00`;
+                    } else {
+                        key = `${dt.getDate().toString().padStart(2, '0')}/${(dt.getMonth() + 1).toString().padStart(2, '0')}`;
+                    }
+                    return key === chartFilters.timelineDate;
+                });
+            }
+
+            // Toggle Clear Filter button visibility
+            const btnClearFilters = document.getElementById('btnClearChartFilters');
+            if (chartFilters.accuracy || chartFilters.timelineDate) {
+                btnClearFilters.style.display = 'inline-block';
+            } else {
+                btnClearFilters.style.display = 'none';
+            }
+
             // Map employee ID to Site
             const empSiteMap = {};
             const empPlayCount = {};
+            gEmpDetailsMap = {};
             rawUsers.forEach(u => {
                 let s = u.site ? u.site.trim().toUpperCase() : 'UNKNOWN';
                 if (s === 'PD') s = 'PPD';
                 if (s === 'NK') s = 'NKL';
                 empSiteMap[String(u.employee_id).trim()] = s;
                 empPlayCount[String(u.employee_id).trim()] = 0;
+                gEmpDetailsMap[String(u.employee_id).trim()] = u;
             });
 
             // Count plays
@@ -489,11 +706,14 @@
                 filteredLogs = filteredLogs.filter(l => empSiteMap[String(l.employee_id).trim()] === siteParam);
             }
 
+            gFilteredLogs = filteredLogs; // save to global for drill-down usage
+
             updateKPIs(filteredLogs, empSiteMap, siteParam);
             renderParticipationChart(empPlayCount, empSiteMap, siteParam);
             renderAccuracyChart(filteredLogs);
             renderTimelineChart(filteredLogs);
             renderQuestionTable(filteredLogs);
+            renderPlayerTable(filteredLogs, empSiteMap, gEmpDetailsMap);
         }
 
         function updateKPIs(logs, empSiteMap, currentSiteFilter) {
@@ -502,10 +722,14 @@
             let totalCorrect = 0;
             let totalSpeedMs = 0;
             let validSpeedCount = 0;
+            let totalPoints = 0;
 
             logs.forEach(l => {
                 activeEmps.add(String(l.employee_id).trim());
-                if ((l.point || 0) > 0) totalCorrect++; // point > 0 means answered correct
+                if ((l.point || 0) > 0) {
+                    totalCorrect++; // point > 0 means answered correct
+                    totalPoints += Number(l.point);
+                }
             });
 
             let baseUsersCount = rawUsers.length;
@@ -520,6 +744,7 @@
 
             document.getElementById('kpiTotalUsers').innerText = `${activeEmps.size} / ${baseUsersCount}`;
             document.getElementById('kpiTotalAnswers').innerText = logs.length.toLocaleString();
+            document.getElementById('kpiTotalPoints').innerText = totalPoints.toLocaleString();
 
             const acc = logs.length > 0 ? ((totalCorrect / logs.length) * 100).toFixed(1) : 0;
             document.getElementById('kpiAccuracy').innerText = `${acc}%`;
@@ -589,6 +814,16 @@
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const dataIndex = elements[0].index;
+                            const label = charts['participationChart'].data.labels[dataIndex];
+                            if (label !== 'ALL') {
+                                document.getElementById('siteFilter').value = label;
+                                filterData();
+                            }
+                        }
+                    },
                     scales: {
                         x: { stacked: true, grid: { display: false } },
                         y: { stacked: true, border: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' } }
@@ -617,7 +852,15 @@
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     cutout: '70%',
-                    plugins: { legend: { position: 'bottom' } }
+                    plugins: { legend: { position: 'bottom' } },
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            if (index === 0) chartFilters.accuracy = 'correct';
+                            else chartFilters.accuracy = 'incorrect';
+                            filterData();
+                        }
+                    }
                 }
             });
         }
@@ -690,6 +933,14 @@
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const clickedDate = charts['timelineChart'].data.labels[index];
+                            chartFilters.timelineDate = clickedDate;
+                            filterData();
+                        }
+                    },
                     scales: {
                         x: { grid: { display: false } },
                         y: { border: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
@@ -732,6 +983,198 @@
                 </tr>`;
             });
             tbody.innerHTML = h || '<tr><td colspan="5" style="text-align:center;">ไม่มีข้อมูล</td></tr>';
+        }
+
+        function renderPlayerTable(logs, empSiteMap, empDetailsMap) {
+            const playerStats = {};
+            const empLogs = {};
+            
+            logs.forEach(l => {
+                const eid = String(l.employee_id).trim();
+                if (!playerStats[eid]) {
+                    playerStats[eid] = {
+                        id: eid,
+                        points: 0,
+                        totalAnswers: 0,
+                        correctAnswers: 0,
+                        avgSpeedSeconds: 0
+                    };
+                }
+                playerStats[eid].totalAnswers++;
+                if ((l.point || 0) > 0) {
+                    playerStats[eid].points += Number(l.point);
+                    playerStats[eid].correctAnswers++;
+                }
+
+                if (!empLogs[eid]) empLogs[eid] = [];
+                empLogs[eid].push(l);
+            });
+
+            for (const eid in playerStats) {
+                const elogs = empLogs[eid];
+                elogs.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                let diffs = [];
+                for (let i = 0; i < elogs.length - 1; i++) {
+                    const diff = new Date(elogs[i].created_at).getTime() - new Date(elogs[i + 1].created_at).getTime();
+                    if (diff > 500 && diff < 15000) {
+                        diffs.push(diff);
+                    }
+                }
+                if (diffs.length > 0) {
+                    playerStats[eid].avgSpeedSeconds = (diffs.reduce((a, b) => a + b, 0) / diffs.length) / 1000;
+                }
+            }
+
+            const pArr = Object.values(playerStats).filter(p => p.totalAnswers > 0);
+            pArr.sort((a, b) => {
+                if (b.points !== a.points) return b.points - a.points;
+                if (a.avgSpeedSeconds !== b.avgSpeedSeconds && a.avgSpeedSeconds > 0 && b.avgSpeedSeconds > 0) return a.avgSpeedSeconds - b.avgSpeedSeconds;
+                return b.correctAnswers - a.correctAnswers;
+            });
+
+            const tbody = document.getElementById('playerTableBody');
+            let h = '';
+            pArr.forEach((p, idx) => {
+                const u = empDetailsMap[p.id] || {};
+                let fullName = u.name || u.first_name || '';
+                if (!fullName && u.first_name_th) fullName = `${u.first_name_th} ${u.last_name_th || ''}`;
+                if (u.nick_name) fullName += ` (${u.nick_name})`;
+                if (!fullName.trim() && u.nickname) fullName += ` (${u.nickname})`;
+                if (!fullName.trim()) fullName = "ไม่ระบุชื่อ";
+
+                const acc = p.totalAnswers > 0 ? ((p.correctAnswers / p.totalAnswers) * 100).toFixed(1) : 0;
+                let color = "white";
+                if (acc < 40) color = "var(--mc-red)";
+                else if (acc > 80) color = "var(--agri-green)";
+                
+                const speedStr = p.avgSpeedSeconds > 0 ? p.avgSpeedSeconds.toFixed(2) : "-";
+
+                h += `<tr class="clickable-row" onclick="openPlayerModal('${p.id}')" style="animation: slideUpFade 0.3s ease ${idx * 0.05}s backwards;">
+                    <td style="color:var(--mc-cyan); font-weight:bold;">${idx + 1}</td>
+                    <td>${p.id}</td>
+                    <td>${fullName}</td>
+                    <td>${empSiteMap[p.id] || '-'}</td>
+                    <td style="text-align:right; color:var(--gold); font-weight:bold;">${p.points.toLocaleString()}</td>
+                    <td style="text-align:right; color:${color}; font-weight:bold;">${acc}%</td>
+                    <td style="text-align:right;">${p.totalAnswers.toLocaleString()}</td>
+                    <td style="text-align:right; color:var(--text-muted);">${speedStr}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = h || '<tr><td colspan="8" style="text-align:center;">ไม่มีข้อมูลผู้เล่นในช่วงเวลานี้</td></tr>';
+        }
+
+        function filterPlayerTableLocally() {
+            const input = document.getElementById("playerSearchInput").value.toLowerCase();
+            const tableBody = document.getElementById("playerTableBody");
+            const tr = tableBody.getElementsByTagName("tr");
+            for (let i = 0; i < tr.length; i++) {
+                if (tr[i].getElementsByTagName("td").length > 0) {
+                    const txtValue = tr[i].textContent || tr[i].innerText;
+                    if (txtValue.toLowerCase().indexOf(input) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        function closePlayerModal() {
+            document.getElementById('playerModal').classList.remove('active');
+        }
+
+        let playerActivityChart;
+
+        function openPlayerModal(empId) {
+            const u = gEmpDetailsMap[empId] || {};
+            let fullName = u.name || u.first_name || '';
+            if (!fullName && u.first_name_th) fullName = `${u.first_name_th} ${u.last_name_th || ''}`;
+            if (u.nick_name) fullName += ` (${u.nick_name})`;
+            if (!fullName.trim() && u.nickname) fullName += ` (${u.nickname})`;
+            if (!fullName.trim()) fullName = "ไม่ระบุชื่อ";
+
+            document.getElementById('pmName').innerHTML = `<i class="fas fa-user-circle" style="color:var(--mc-cyan)"></i> ${fullName} <span style="font-size:14px; color:var(--text-muted); font-weight:normal; margin-left:10px;">ID: ${empId} | ${u.site || '-'}</span>`;
+
+            const pLogs = gFilteredLogs.filter(l => String(l.employee_id).trim() === empId);
+            
+            let pts = 0, correct = 0, speedSum = 0, speedCount = 0;
+            pLogs.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+            
+            let histHtml = '';
+            
+            pLogs.forEach((l, i) => {
+                if ((l.point || 0) > 0) { pts += Number(l.point); correct++; }
+                let timeDiff = "-";
+                if (i < pLogs.length - 1) {
+                    const diff = new Date(l.created_at).getTime() - new Date(pLogs[i+1].created_at).getTime();
+                    if (diff > 500 && diff < 15000) {
+                        timeDiff = (diff/1000).toFixed(2);
+                        speedSum += (diff/1000); speedCount++;
+                    }
+                }
+
+                if (i < 20) {
+                    const dtStr = new Date(l.created_at).toLocaleString('th-TH');
+                    const isCorr = (l.point || 0) > 0;
+                    const statusHtml = isCorr ? `<span style="color:var(--agri-green)"><i class="fas fa-check-circle"></i> ถูกต้อง</span>` : `<span style="color:var(--mc-red)"><i class="fas fa-times-circle"></i> ผิด</span>`;
+                    histHtml += `<tr>
+                        <td style="font-size:12px; color:var(--text-muted);">${dtStr}</td>
+                        <td style="font-size:12px; font-weight:600;">Q${l.question_id || '-'}</td>
+                        <td style="text-align:center;">${statusHtml}</td>
+                        <td style="text-align:right; font-weight:bold; color:${isCorr?'var(--gold)':'var(--text-muted)'}">${l.point || 0}</td>
+                        <td style="text-align:right;">${timeDiff}</td>
+                    </tr>`;
+                }
+            });
+
+            const acc = pLogs.length > 0 ? ((correct/pLogs.length)*100).toFixed(1) : 0;
+            const avgSpeed = speedCount > 0 ? (speedSum/speedCount).toFixed(2) : "-";
+
+            document.getElementById('pmScore').innerText = pts.toLocaleString();
+            document.getElementById('pmAcc').innerText = acc + "%";
+            document.getElementById('pmSpeed').innerText = avgSpeed;
+            document.getElementById('pmTotal').innerText = pLogs.length.toLocaleString();
+            document.getElementById('pmHistoryTable').innerHTML = histHtml || `<tr><td colspan="5" style="text-align:center;">ไม่มีประวัติการทำข้อสอบ</td></tr>`;
+
+            const timeBuckets = {};
+            const now = new Date();
+            for(let i=6; i>=0; i--) {
+                let d = new Date(now); d.setDate(d.getDate()-i);
+                timeBuckets[`${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}`] = 0;
+            }
+            pLogs.forEach(l => {
+                const dt = new Date(l.created_at);
+                const k = `${dt.getDate().toString().padStart(2,'0')}/${(dt.getMonth()+1).toString().padStart(2,'0')}`;
+                if (timeBuckets[k] !== undefined) timeBuckets[k]++;
+                else timeBuckets[k] = 1; // if beyond 7 days
+            });
+            
+            const keys = Object.keys(timeBuckets).sort();
+            const values = keys.map(k=>timeBuckets[k]);
+
+            if (playerActivityChart) playerActivityChart.destroy();
+            const ctx = document.getElementById('pmActivityChart').getContext('2d');
+            playerActivityChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: keys,
+                    datasets: [{
+                        label: 'จำนวนที่ตอบ (ข้อ)',
+                        data: values,
+                        backgroundColor: '#8a2be2',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { border: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
+                    }
+                }
+            });
+
+            document.getElementById('playerModal').classList.add('active');
         }
 
         // Boot
